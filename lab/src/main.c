@@ -3,6 +3,7 @@
 
 #include "defines.h"
 #include "platform_linux.h"
+#include "vulkan_device.h"
 #include "vulkan_init.h"
 #include "vulkan_utils.h"
 
@@ -27,6 +28,8 @@ int main() {
     exit(1);
   }
 
+  result = get_vk_physical_device(&vulkan_context);
+
   result = create_vulkan_surface(&vulkan_context, linux_context.window);
   if (!result.success) {
     fprintf(stderr, "Vulkan error: %s\n", result.message);
@@ -34,6 +37,7 @@ int main() {
     cleanup_linux(&linux_context);
     exit(1);
   }
+  fprintf(stdout, "Vulkan Surface created.\n");
 
   // Game loop
   poll_events(&linux_context);

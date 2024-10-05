@@ -10,7 +10,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   u32 physical_device_count = 0;
   VkPhysicalDevice vk_physical_device = {0};
   VkPhysicalDeviceProperties vk_physical_device_properties = {0};
-  VkQueueFamilyProperties vk_queue_family_properties = {0};
+  VkQueueFamilyProperties vk_queue_family_properties[32];
   u32 vk_queue_family_property_count = 0;
 
   vk_result = vkEnumeratePhysicalDevices(context->instance,
@@ -44,7 +44,11 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
 
   vkGetPhysicalDeviceQueueFamilyProperties(vk_physical_device,
                                            &vk_queue_family_property_count,
-                                           &vk_queue_family_properties);
+                                           vk_queue_family_properties);
+
+  for (int i = 0; i < vk_queue_family_property_count; i++) {
+    fprintf(stdout, "Queue Family Property: %u\n", vk_queue_family_properties[i].queueCount);
+  }
 
   VkDeviceQueueCreateInfo vk_device_queue_create_info = {
       VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
@@ -54,3 +58,5 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
 
   return result;
 }
+
+

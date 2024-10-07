@@ -8,10 +8,10 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   result_t result = {.success = TRUE, NULL};
 
   u32 physical_device_count = 0;
-  VkPhysicalDevice vk_physical_device = {0};
-  VkPhysicalDeviceProperties vk_physical_device_properties = {0};
-  VkQueueFamilyProperties vk_queue_family_properties[32];
-  u32 vk_queue_family_property_count = 0;
+  VkPhysicalDevice physical_device = {0};
+  VkPhysicalDeviceProperties physical_device_props = {0};
+  VkQueueFamilyProperties queue_family_props[32];
+  u32 queue_family_prop_count = 0;
 
   vk_result = vkEnumeratePhysicalDevices(context->instance,
                                          &physical_device_count, NULL);
@@ -20,43 +20,46 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   fprintf(stdout, "Physical Device Count: %d\n", physical_device_count);
 
   vk_result = vkEnumeratePhysicalDevices(
-      context->instance, &physical_device_count, &vk_physical_device);
+      context->instance, &physical_device_count, &physical_device);
   result = check_vk_result(vk_result);
 
   fprintf(stdout, "Physical Device Created\n");
 
-  vkGetPhysicalDeviceProperties(vk_physical_device,
-                                &vk_physical_device_properties);
+  vkGetPhysicalDeviceProperties(physical_device, &physical_device_props);
   fprintf(stdout,
           "Device Name: %s\nAPI Version: %u\nDriver Version:%u\nVendor ID: "
           "%u\nDevice ID: %u\n",
-          vk_physical_device_properties.deviceName,
-          vk_physical_device_properties.apiVersion,
-          vk_physical_device_properties.driverVersion,
-          vk_physical_device_properties.vendorID,
-          vk_physical_device_properties.deviceID);
+          physical_device_props.deviceName, physical_device_props.apiVersion,
+          physical_device_props.driverVersion, physical_device_props.vendorID,
+          physical_device_props.deviceID);
+
+  vkGetPhysicalDeviceQueueFamilyProperties(physical_device,
+                                           &queue_family_prop_count, NULL);
+
+  fprintf(stdout, "Queue Family Property Count: %u\n", queue_family_prop_count);
 
   vkGetPhysicalDeviceQueueFamilyProperties(
-      vk_physical_device, &vk_queue_family_property_count, NULL);
+      physical_device, &queue_family_prop_count, queue_family_props);
 
-  fprintf(stdout, "Queue Family Property Count: %u\n",
-          vk_queue_family_property_count);
+  // `i` is `queueFamilyIndex` for `VkDeviceQueueCreateInfo`
+  for (int i = 0; i < queue_family_prop_count; i++) {
+    fprintf(stdout, "Queue Family Index %u Properties: %u\n", i,
+            queue_family_props[i].queueCount);
 
-  vkGetPhysicalDeviceQueueFamilyProperties(vk_physical_device,
-                                           &vk_queue_family_property_count,
-                                           vk_queue_family_properties);
+    float priorities[32];
+    for (int i = 0; i < 32; ++i) {
+      priorities[i] = 1.0f;
+    }
 
-  for (int i = 0; i < vk_queue_family_property_count; i++) {
-    fprintf(stdout, "Queue Family Property: %u\n", vk_queue_family_properties[i].queueCount);
+    VkDeviceQueueCreateInfo queue_create_info = {};
+    queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    queue_create_info.queueFamilyIndex = i;
+    queue_create_info.queueCount = queue_family_props[i].queueCount;
+    queue_create_info.pQueuePriorities = priorities;
   }
 
-  VkDeviceQueueCreateInfo vk_device_queue_create_info = {
-      VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};
-
-  VkDeviceCreateInfo vk_device_create_info = {
-      VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
+  VkDeviceCreateInfo device_create_info = {};
+  device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
   return result;
 }
-
-

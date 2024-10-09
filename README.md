@@ -7,3 +7,6 @@ This project is a proof of concept 2D/3D renderer implementation in Vulkan. The 
 ## Goal
 
 I'm going to start with a simple 2D arcade-style space shooter in the vein of Truxton, Gradius, and R-Type etc.
+
+## First Steps
+![first_steps](https://github.com/user-attachments/assets/eee365b5-92d5-414e-a32e-7c359529ca9f)

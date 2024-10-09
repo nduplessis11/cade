@@ -71,6 +71,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   result = check_vk_result(vk_result);
 
   fprintf(stdout, "Device Created\n");
+  context->device = device;
 
   return result;
 }

@@ -53,6 +53,9 @@ void cleanup_vulkan(vulkan_context_t *context) {
   if (context->surface != VK_NULL_HANDLE) {
     vkDestroySurfaceKHR(context->instance, context->surface, NULL);
   }
+  if (context->device != VK_NULL_HANDLE) {
+    vkDestroyDevice(context->device, NULL);
+  }
   if (context->instance != VK_NULL_HANDLE) {
     vkDestroyInstance(context->instance, NULL);
   }

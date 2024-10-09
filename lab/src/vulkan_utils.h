@@ -13,6 +13,7 @@
 typedef struct {
   VkInstance instance;
   VkSurfaceKHR surface;
+  VkDevice device;
   xcb_connection_t *connection;
 } vulkan_context_t;
 

@@ -5,6 +5,7 @@
 #include "platform_linux.h"
 #include "vulkan_device.h"
 #include "vulkan_init.h"
+#include "vulkan_swapchain.h"
 #include "vulkan_utils.h"
 
 int main() {
@@ -38,6 +39,8 @@ int main() {
     exit(1);
   }
   fprintf(stdout, "Vulkan Surface created.\n");
+
+  result = create_swapchain(&vulkan_context);
 
   // Game loop
   poll_events(&linux_context);

@@ -31,7 +31,7 @@ result_t initialize_vulkan(vulkan_context_t *context) {
   free(extensions);
 
   VkApplicationInfo appInfo = {.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-                               .pApplicationName = "Vulkan XCB Example",
+                               .pApplicationName = "Game Application",
                                .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
                                .pEngineName = "No engine",
                                .engineVersion = VK_MAKE_VERSION(1, 0, 0),

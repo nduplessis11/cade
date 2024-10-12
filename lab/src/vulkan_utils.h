@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdio.h>
 #include <xcb/xcb.h>
 
 #include <vulkan/vulkan.h>
@@ -92,4 +93,54 @@ static inline b8 is_layer_available(const char *layer, u8 layer_count,
     }
   }
   return FALSE;
+}
+
+static inline const char* to_string_message_severity(VkDebugUtilsMessageSeverityFlagBitsEXT s) {
+    switch (s) {
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+            return "VERBOSE";
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+            return "ERROR";
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+            return "WARNING";
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+            return "INFO";
+        default:
+            return "UNKNOWN";
+    }
+}
+
+static inline const char* to_string_message_type(VkDebugUtilsMessageTypeFlagsEXT s) {
+    if (s == 7) return "General | Validation | Performance";
+    if (s == 6) return "Validation | Performance";
+    if (s == 5) return "General | Performance";
+    if (s == 4 /*VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT*/) return "Performance";
+    if (s == 3) return "General | Validation";
+    if (s == 2 /*VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT*/) return "Validation";
+    if (s == 1 /*VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT*/) return "General";
+    return "Unknown";
+}
+
+// Default debug messenger
+static inline VKAPI_ATTR VkBool32 VKAPI_CALL default_debug_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData) {
+  const char *ms = to_string_message_severity(messageSeverity);
+  const char *mt = to_string_message_type(messageType);
+  fprintf(stdout, "[%s: %s]\n%s\n", ms, mt, pCallbackData->pMessage);
+
+  return VK_FALSE; // Applications must return false here
+}
+
+static inline void create_debug_messenger() {
+  VkDebugUtilsMessengerCreateInfoEXT create_info = {};
+  create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+  create_info.pfnUserCallback = default_debug_callback;
+  create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+  create_info.messageSeverity =
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 }

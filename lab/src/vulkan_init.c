@@ -1,4 +1,5 @@
 #include "vulkan_init.h"
+#include "vulkan_utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,20 +36,23 @@ result_t initialize_vulkan(vulkan_context_t *context) {
   // Enable Validation Layers: "VK_LAYER_KHRONOS_validation" is built-in default
   u32 layer_count;
   VkLayerProperties available_layers[32];
-  const char *requested_layer = "VK_LAYER_KHRONOS_validation";
+  const char *required_layer = "VK_LAYER_KHRONOS_validation";
   vkEnumerateInstanceLayerProperties(&layer_count, NULL);
   vkEnumerateInstanceLayerProperties(&layer_count, available_layers);
   b8 layer_found = FALSE;
   for (int i = 0; i < layer_count; i++) {
-    if (strcmp(available_layers[i].layerName, requested_layer) == 0) {
+    if (strcmp(available_layers[i].layerName, required_layer) == 0) {
       layer_found = TRUE;
-      fprintf(stdout, "Layer found: %s\n", requested_layer);
+      fprintf(stdout, "Layer found: %s\n", required_layer);
       break;
     }
   }
   if (!layer_found) {
-    fprintf(stderr, "Validation layer not found: %s\n", requested_layer);
+    fprintf(stderr, "Validation layer not found: %s\n", required_layer);
   }
+
+  // Setup vulkan debugging
+  create_debug_messenger();
 
   VkApplicationInfo appInfo = {.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
                                .pApplicationName = "Game Application",

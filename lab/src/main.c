@@ -29,6 +29,12 @@ int main() {
     exit(1);
   }
 
+  // Setup vulkan debugging
+  result = create_debug_messenger(&vulkan_context);
+  if (!result.success) {
+    fprintf(stderr, "Failed to created debug messenger: %s\n", result.message);
+  }
+
   result = get_vk_physical_device(&vulkan_context);
 
   result = create_vulkan_surface(&vulkan_context, linux_context.window);

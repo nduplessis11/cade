@@ -57,7 +57,8 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   float queue_priority = 1.0f;
   VkDeviceQueueCreateInfo queue_create_info = {};
   queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-  queue_create_info.queueFamilyIndex = queue_family_index;
+  queue_create_info.queueFamilyIndex =
+      UINT32_MAX; // queue_family_index; (Failing on purpose to test debug messenger + validation)
   queue_create_info.queueCount = 1;
   queue_create_info.pQueuePriorities = &queue_priority;
 

@@ -19,8 +19,9 @@ result_t initialize_vulkan(vulkan_context_t *context) {
 
   // Check if the required extensions are available
   const char *required_extensions[] = {VK_KHR_SURFACE_EXTENSION_NAME,
-                                       VK_KHR_XCB_SURFACE_EXTENSION_NAME};
-  for (int i = 0; i < 2; i++) {
+                                       VK_KHR_XCB_SURFACE_EXTENSION_NAME,
+                                       VK_EXT_DEBUG_UTILS_EXTENSION_NAME};
+  for (int i = 0; i < 3; i++) {
     if (!is_extension_available(required_extensions[i], extension_count,
                                 extensions)) {
       fprintf(stderr, "Required extension %s not available\n",
@@ -51,9 +52,6 @@ result_t initialize_vulkan(vulkan_context_t *context) {
     fprintf(stderr, "Validation layer not found: %s\n", required_layer);
   }
 
-  // Setup vulkan debugging
-  create_debug_messenger();
-
   VkApplicationInfo appInfo = {.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
                                .pApplicationName = "Game Application",
                                .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
@@ -64,8 +62,11 @@ result_t initialize_vulkan(vulkan_context_t *context) {
   VkInstanceCreateInfo createInfo = {
       .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
       .pApplicationInfo = &appInfo,
-      .enabledExtensionCount = 2,
-      .ppEnabledExtensionNames = required_extensions};
+      .enabledExtensionCount = 3,
+      .ppEnabledExtensionNames = required_extensions,
+      .ppEnabledLayerNames = &required_layer,
+      .pNext = 0}; // TODO: Make `pNext` point to debug_messenger create_info
+      
 
   vk_result = vkCreateInstance(&createInfo, NULL, &context->instance);
   result = check_vk_result(vk_result);

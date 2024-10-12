@@ -73,10 +73,21 @@ static inline result_t check_vk_result(VkResult vk_result) {
   return result;
 }
 
-static inline b8 is_extension_available(const char *extension, u8 extension_count,
-                                 VkExtensionProperties *extensions) {
+static inline b8 is_extension_available(const char *extension,
+                                        u8 extension_count,
+                                        VkExtensionProperties *extensions) {
   for (u8 i = 0; i < extension_count; i++) {
     if (strcmp(extension, extensions[i].extensionName) == 0) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+static inline b8 is_layer_available(const char *layer, u8 layer_count,
+                                    VkLayerProperties *layers) {
+  for (u8 i = 0; i < layer_count; i++) {
+    if (strcmp(layer, layers[i].layerName) == 0) {
       return TRUE;
     }
   }

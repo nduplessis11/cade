@@ -1,12 +1,18 @@
-# Proof of Concept: Cross-platform 2D/3D Vulkan Renderer
+# CADE (Complete Arcade Development Environment)
 
 ## Overview
 
-This project is a proof of concept 2D/3D renderer implementation in Vulkan. The goal is to "live off the land," coding everything from scratch without relying on external libraries or frameworks. There are expceptions to low level interfaces to audio/video/io devices as these are complex and vendor specific.
+An arcade game development platform and engine.
+
+## Features
+Low input latency
+Scoring interface
+Credit mechanics
+Tileset and Spritesheet support
 
 ## Goal
 
-I'm going to start with a simple 2D arcade-style space shooter in the vein of Truxton, Gradius, and R-Type etc.
+Create simple 2D arcade-style space shooter (Truxton, Gradius, and R-Type etc) and design an engine around that.
 
 ## First Steps
 ![first_steps](https://github.com/user-attachments/assets/eee365b5-92d5-414e-a32e-7c359529ca9f)

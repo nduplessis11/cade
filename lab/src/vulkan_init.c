@@ -105,6 +105,9 @@ void cleanup_vulkan(vulkan_context_t *context) {
   if (context->device != VK_NULL_HANDLE) {
     vkDestroyDevice(context->device, NULL);
   }
+  if (context->debug_messenger != VK_NULL_HANDLE) {
+    destroy_debug_messenger(context);
+  }
   if (context->instance != VK_NULL_HANDLE) {
     vkDestroyInstance(context->instance, NULL);
   }

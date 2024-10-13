@@ -15,6 +15,7 @@ typedef struct {
   VkInstance instance;
   VkSurfaceKHR surface;
   VkDevice device;
+  VkDebugUtilsMessengerEXT debug_messenger;
   xcb_connection_t *connection;
 } vulkan_context_t;
 
@@ -171,10 +172,30 @@ create_debug_messenger(vulkan_context_t *context,
     result = check_vk_result(vk_result);
     if (result.success == TRUE) {
       fprintf(stdout, "Debug Messenger Created\n");
+      context->debug_messenger = debug_messenger;
     } else {
       fprintf(stderr, "Failed to create debug messenger: %s\n", result.message);
     }
   }
 
   return result;
+}
+
+static PFN_vkDestroyDebugUtilsMessengerEXT
+load_vkDestroyDebugUtilsMessengerEXT(VkInstance instance) {
+  PFN_vkDestroyDebugUtilsMessengerEXT func =
+      (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+          instance, "vkDestroyDebugUtilsMessengerEXT");
+  if (func == NULL) {
+    fprintf(stderr, "Function not found: 'vkDestroyDebugUtilsMessengerEXT'\n");
+  }
+  return func;
+}
+
+static inline void destroy_debug_messenger(vulkan_context_t *context) {
+  PFN_vkDestroyDebugUtilsMessengerEXT func =
+      load_vkDestroyDebugUtilsMessengerEXT(context->instance);
+  if (func != NULL) {
+    func(context->instance, context->debug_messenger, NULL);
+  }
 }

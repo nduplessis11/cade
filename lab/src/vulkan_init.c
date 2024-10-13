@@ -79,7 +79,8 @@ result_t initialize_vulkan(vulkan_context_t *context) {
       .enabledExtensionCount = 3,
       .ppEnabledExtensionNames = required_extensions,
       .ppEnabledLayerNames = &required_layer,
-      .pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debug_create_info}; // TODO: Make `pNext` point to debug_messenger create_info
+      .enabledLayerCount = 1,
+      .pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debug_create_info};
 
   vk_result = vkCreateInstance(&createInfo, NULL, &context->instance);
   result = check_vk_result(vk_result);

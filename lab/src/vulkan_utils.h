@@ -156,24 +156,25 @@ load_vkCreateDebugUtilsMessengerEXT(VkInstance instance) {
   return func;
 }
 
-static inline result_t create_debug_messenger(vulkan_context_t *context, VkDebugUtilsMessengerCreateInfoEXT *debug_create_info) {
+static inline result_t
+create_debug_messenger(vulkan_context_t *context,
+                       VkDebugUtilsMessengerCreateInfoEXT *debug_create_info) {
   result_t result = {.success = TRUE, .message = NULL};
-
-
 
   VkDebugUtilsMessengerEXT debug_messenger;
   // Load the function pointer
   PFN_vkCreateDebugUtilsMessengerEXT func =
       load_vkCreateDebugUtilsMessengerEXT(context->instance);
   if (func != NULL) {
-    VkResult vk_result = func(context->instance, debug_create_info, NULL, &debug_messenger);
+    VkResult vk_result =
+        func(context->instance, debug_create_info, NULL, &debug_messenger);
     result = check_vk_result(vk_result);
     if (result.success == TRUE) {
       fprintf(stdout, "Debug Messenger Created\n");
     } else {
       fprintf(stderr, "Failed to create debug messenger: %s\n", result.message);
     }
-  } 
-  
+  }
+
   return result;
 }

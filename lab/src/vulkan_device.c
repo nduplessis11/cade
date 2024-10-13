@@ -8,7 +8,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   result_t result = {.success = TRUE, NULL};
 
   u32 physical_device_count = 0;
-  VkPhysicalDevice physical_device = {0};
+  VkPhysicalDevice physical_device [32];
   VkPhysicalDeviceProperties physical_device_props = {0};
   VkQueueFamilyProperties queue_family_props[32];
   u32 queue_family_prop_count = 0;
@@ -21,12 +21,12 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   fprintf(stdout, "Physical Device Count: %d\n", physical_device_count);
 
   vk_result = vkEnumeratePhysicalDevices(
-      context->instance, &physical_device_count, &physical_device);
+      context->instance, &physical_device_count, physical_device);
   result = check_vk_result(vk_result);
 
   fprintf(stdout, "Physical Device Found\n");
 
-  vkGetPhysicalDeviceProperties(physical_device, &physical_device_props);
+  vkGetPhysicalDeviceProperties(physical_device[0], &physical_device_props);
   fprintf(stdout,
           "Device Name: %s\nAPI Version: %u\nDriver Version:%u\nVendor ID: "
           "%u\nDevice ID: %u\n",
@@ -34,13 +34,13 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
           physical_device_props.driverVersion, physical_device_props.vendorID,
           physical_device_props.deviceID);
 
-  vkGetPhysicalDeviceQueueFamilyProperties(physical_device,
+  vkGetPhysicalDeviceQueueFamilyProperties(physical_device[0],
                                            &queue_family_prop_count, NULL);
 
   fprintf(stdout, "Queue Family Property Count: %u\n", queue_family_prop_count);
 
   vkGetPhysicalDeviceQueueFamilyProperties(
-      physical_device, &queue_family_prop_count, queue_family_props);
+      physical_device[0], &queue_family_prop_count, queue_family_props);
 
   u8 queue_family_index;
   for (int i = 0; i < queue_family_prop_count; i++) {
@@ -57,8 +57,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   float queue_priority = 1.0f;
   VkDeviceQueueCreateInfo queue_create_info = {};
   queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-  queue_create_info.queueFamilyIndex =
-      UINT32_MAX; // queue_family_index; (Failing on purpose to test debug messenger + validation)
+  queue_create_info.queueFamilyIndex = queue_family_index;
   queue_create_info.queueCount = 1;
   queue_create_info.pQueuePriorities = &queue_priority;
 
@@ -68,7 +67,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   device_create_info.pQueueCreateInfos = &queue_create_info;
 
   vk_result =
-      vkCreateDevice(physical_device, &device_create_info, NULL, &device);
+      vkCreateDevice(physical_device[0], &device_create_info, NULL, &device);
   result = check_vk_result(vk_result);
 
   fprintf(stdout, "Device Created\n");

@@ -156,26 +156,17 @@ load_vkCreateDebugUtilsMessengerEXT(VkInstance instance) {
   return func;
 }
 
-static inline result_t create_debug_messenger(vulkan_context_t *context) {
+static inline result_t create_debug_messenger(vulkan_context_t *context, VkDebugUtilsMessengerCreateInfoEXT *debug_create_info) {
   result_t result = {.success = TRUE, .message = NULL};
 
-  VkDebugUtilsMessengerCreateInfoEXT create_info = {};
-  create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-  create_info.pfnUserCallback = default_debug_callback;
-  create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-  create_info.messageSeverity =
-      VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-      VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-  create_info.pUserData = NULL; // Optional
+
 
   VkDebugUtilsMessengerEXT debug_messenger;
   // Load the function pointer
   PFN_vkCreateDebugUtilsMessengerEXT func =
       load_vkCreateDebugUtilsMessengerEXT(context->instance);
   if (func != NULL) {
-    VkResult vk_result = func(context->instance, &create_info, NULL, &debug_messenger);
+    VkResult vk_result = func(context->instance, debug_create_info, NULL, &debug_messenger);
     result = check_vk_result(vk_result);
     if (result.success == TRUE) {
       fprintf(stdout, "Debug Messenger Created\n");

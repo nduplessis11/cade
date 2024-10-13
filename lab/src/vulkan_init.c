@@ -59,17 +59,40 @@ result_t initialize_vulkan(vulkan_context_t *context) {
                                .engineVersion = VK_MAKE_VERSION(1, 0, 0),
                                .apiVersion = VK_API_VERSION_1_0};
 
+  // Setup vulkan debugging
+  VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {};
+  debug_create_info.sType =
+      VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+  debug_create_info.pfnUserCallback = default_debug_callback;
+  debug_create_info.messageType =
+      VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+  debug_create_info.messageSeverity =
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+  debug_create_info.pUserData = NULL; // Optional
+
   VkInstanceCreateInfo createInfo = {
       .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
       .pApplicationInfo = &appInfo,
       .enabledExtensionCount = 3,
       .ppEnabledExtensionNames = required_extensions,
       .ppEnabledLayerNames = &required_layer,
-      .pNext = 0}; // TODO: Make `pNext` point to debug_messenger create_info
-      
+      .pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debug_create_info}; // TODO: Make `pNext` point to debug_messenger create_info
 
   vk_result = vkCreateInstance(&createInfo, NULL, &context->instance);
   result = check_vk_result(vk_result);
+  if (result.success) {
+    fprintf(stdout, "Vulkan initialized\n");
+  } else {
+    fprintf(stderr, "Failed initializing Vulkan: %s", result.message);
+  }
+
+  result = create_debug_messenger(context, &debug_create_info);
+  if (!result.success) {
+    fprintf(stderr, "Failed to created debug messenger: %s\n", result.message);
+  }
 
   return result;
 }

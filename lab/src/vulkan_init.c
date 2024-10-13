@@ -13,8 +13,7 @@ result_t initialize_vulkan(vulkan_context_t *context) {
   // Query available extensions
   u32 extension_count = 0;
   vkEnumerateInstanceExtensionProperties(NULL, &extension_count, NULL);
-  VkExtensionProperties *extensions =
-      malloc(extension_count * sizeof(VkExtensionProperties));
+  VkExtensionProperties extensions[32];
   vkEnumerateInstanceExtensionProperties(NULL, &extension_count, extensions);
 
   // Check if the required extensions are available
@@ -26,12 +25,10 @@ result_t initialize_vulkan(vulkan_context_t *context) {
                                 extensions)) {
       fprintf(stderr, "Required extension %s not available\n",
               required_extensions[i]);
-      free(extensions);
       xcb_disconnect(context->connection);
       exit(1);
     }
   }
-  free(extensions);
 
   // TODO: Extract this out to vulkan_util
   // Enable Validation Layers: "VK_LAYER_KHRONOS_validation" is built-in default

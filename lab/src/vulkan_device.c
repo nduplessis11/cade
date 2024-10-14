@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <vulkan/vulkan_core.h>
 
-b8 is_device_supported(VkPhysicalDevice device);
+b8 is_device_supported(VkPhysicalDevice device,
+                       const char *required_extension[]);
 
 result_t get_vk_physical_device(vulkan_context_t *context) {
   VkResult vk_result = {0};
@@ -26,8 +27,16 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
       context->instance, &physical_device_count, physical_device);
   result = check_vk_result(vk_result);
 
-  fprintf(stdout, "Physical Device Found\n");
-
+  const char *required_extensions[32];
+  required_extensions[0] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+  // TODO: Replace with FATAL when assertions implemented
+  if (!is_device_supported(physical_device[0], required_extensions)) {
+    result.success = FALSE;
+    result.message = "Physical device not supported";
+    return result;
+  }
+  fprintf(stdout, "Physical device selected\n");
+  context->physical_device = physical_device[0];
   vkGetPhysicalDeviceProperties(physical_device[0], &physical_device_props);
   fprintf(stdout,
           "Device Name: %s\nAPI Version: %u\nDriver Version:%u\nVendor ID: "
@@ -43,8 +52,6 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
 
   vkGetPhysicalDeviceQueueFamilyProperties(
       physical_device[0], &queue_family_prop_count, queue_family_props);
-
-  is_device_supported(physical_device[0]);
 
   u8 queue_family_index;
   for (int i = 0; i < queue_family_prop_count; i++) {
@@ -69,6 +76,8 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
   device_create_info.queueCreateInfoCount = 1;
   device_create_info.pQueueCreateInfos = &queue_create_info;
+  device_create_info.enabledExtensionCount = 1;
+  device_create_info.ppEnabledExtensionNames = required_extensions;
 
   vk_result =
       vkCreateDevice(physical_device[0], &device_create_info, NULL, &device);
@@ -80,20 +89,20 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   return result;
 }
 
-b8 is_device_supported(VkPhysicalDevice device) {
+b8 is_device_supported(VkPhysicalDevice device,
+                       const char *required_extensions[]) {
   b8 is_supported = FALSE;
-  const char *required_extensions[32];
-  required_extensions[0] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 
   u32 prop_count;
-  VkExtensionProperties ext_props[512];
+  VkExtensionProperties ext_props[512]; // TODO: Dynamic allocate when memory
+                                        // allocator implemented
   vkEnumerateDeviceExtensionProperties(device, NULL, &prop_count, NULL);
   fprintf(stdout, "Device Extension Property Count: %u\n", prop_count);
   vkEnumerateDeviceExtensionProperties(device, NULL, &prop_count, ext_props);
 
   for (int i = 0; i < prop_count; i++) {
     if (strcmp(ext_props[i].extensionName, required_extensions[0]) == 0) {
-      fprintf(stdout, "Device supported\n");
+      fprintf(stdout, "Physical device supported\n");
       is_supported = TRUE;
       break;
     }

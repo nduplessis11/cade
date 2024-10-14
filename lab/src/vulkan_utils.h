@@ -14,6 +14,7 @@
 typedef struct {
   VkInstance instance;
   VkSurfaceKHR surface;
+  VkPhysicalDevice physical_device;
   VkDevice device;
   VkDebugUtilsMessengerEXT debug_messenger;
   xcb_connection_t *connection;

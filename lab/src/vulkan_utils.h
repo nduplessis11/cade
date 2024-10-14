@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "defines.h"
+#include "logger.h"
 
 typedef struct {
   VkInstance instance;
@@ -113,6 +114,7 @@ to_string_message_severity(VkDebugUtilsMessageSeverityFlagBitsEXT s) {
   }
 }
 
+// TODO: Sync with CADE log levels
 static inline const char *
 to_string_message_type(VkDebugUtilsMessageTypeFlagsEXT s) {
   if (s == 7)
@@ -138,10 +140,9 @@ static inline VKAPI_ATTR VkBool32 VKAPI_CALL default_debug_callback(
     VkDebugUtilsMessageTypeFlagsEXT messageType,
     const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
     void *pUserData) {
-  fprintf(stdout, "TEST DEBUG MESSENGER TRIGGERED\n");
   const char *ms = to_string_message_severity(messageSeverity);
   const char *mt = to_string_message_type(messageType);
-  fprintf(stdout, "[%s: %s]\n%s\n", ms, mt, pCallbackData->pMessage);
+  CADE_WARN("[%s: %s]\n%s", ms, mt, pCallbackData->pMessage);
 
   return VK_FALSE; // Applications must return false here
 }
@@ -153,7 +154,7 @@ load_vkCreateDebugUtilsMessengerEXT(VkInstance instance) {
       (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
           instance, "vkCreateDebugUtilsMessengerEXT");
   if (func == NULL) {
-    fprintf(stderr, "Function not found: 'vkCreateDebugUtilsMessengerEXT'\n");
+    CADE_ERROR("Function not found: 'vkCreateDebugUtilsMessengerEXT'");
   }
   return func;
 }
@@ -172,10 +173,10 @@ create_debug_messenger(vulkan_context_t *context,
         func(context->instance, debug_create_info, NULL, &debug_messenger);
     result = check_vk_result(vk_result);
     if (result.success == TRUE) {
-      fprintf(stdout, "Debug Messenger Created\n");
+      CADE_INFO("Debug Messenger Created");
       context->debug_messenger = debug_messenger;
     } else {
-      fprintf(stderr, "Failed to create debug messenger: %s\n", result.message);
+      CADE_ERROR("Failed to create debug messenger: %s", result.message);
     }
   }
 
@@ -188,7 +189,7 @@ load_vkDestroyDebugUtilsMessengerEXT(VkInstance instance) {
       (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
           instance, "vkDestroyDebugUtilsMessengerEXT");
   if (func == NULL) {
-    fprintf(stderr, "Function not found: 'vkDestroyDebugUtilsMessengerEXT'\n");
+    CADE_ERROR("Function not found: 'vkDestroyDebugUtilsMessengerEXT'");
   }
   return func;
 }

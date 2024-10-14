@@ -1,10 +1,11 @@
 #include "vulkan_swapchain.h"
+#include "logger.h"
 #include <stdio.h>
 #include <vulkan/vulkan_core.h>
 
 result_t create_swapchain(vulkan_context_t *context) {
   result_t result = {.success = TRUE, .message = NULL};
-  fprintf(stdout, "Creating swapchain...\n");
+  CADE_INFO("Creating swapchain...");
 
   VkSwapchainKHR swapchain = {0};
 

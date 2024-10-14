@@ -10,7 +10,6 @@
 #include <stdio.h>
 
 #define ASSERTIONS_ENABLED
-#define DEBUG
 
 #ifdef ASSERTIONS_ENABLED
 #define CADE_ASSERT(expr)                                                      \

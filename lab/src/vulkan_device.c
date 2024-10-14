@@ -1,4 +1,5 @@
 #include "vulkan_device.h"
+#include "logger.h"
 #include "vulkan_utils.h"
 #include <stdio.h>
 #include <vulkan/vulkan_core.h>
@@ -21,7 +22,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
                                          &physical_device_count, NULL);
   result = check_vk_result(vk_result);
 
-  fprintf(stdout, "Physical Device Count: %d\n", physical_device_count);
+  CADE_DEBUG("Physical Device Count: %u", physical_device_count);
 
   vk_result = vkEnumeratePhysicalDevices(
       context->instance, &physical_device_count, physical_device);
@@ -29,26 +30,24 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
 
   const char *required_extensions[32];
   required_extensions[0] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
-  // TODO: Replace with FATAL when assertions implemented
   if (!is_device_supported(physical_device[0], required_extensions)) {
     result.success = FALSE;
     result.message = "Physical device not supported";
     return result;
   }
-  fprintf(stdout, "Physical device selected\n");
+  CADE_INFO("Physical device selected");
   context->physical_device = physical_device[0];
   vkGetPhysicalDeviceProperties(physical_device[0], &physical_device_props);
-  fprintf(stdout,
-          "Device Name: %s\nAPI Version: %u\nDriver Version:%u\nVendor ID: "
-          "%u\nDevice ID: %u\n",
-          physical_device_props.deviceName, physical_device_props.apiVersion,
-          physical_device_props.driverVersion, physical_device_props.vendorID,
-          physical_device_props.deviceID);
+  CADE_INFO("Device Name: %s\n\tAPI Version: %u\n\tDriver Version:%u\n\tVendor ID: "
+            "%u\n\tDevice ID: %u",
+            physical_device_props.deviceName, physical_device_props.apiVersion,
+            physical_device_props.driverVersion, physical_device_props.vendorID,
+            physical_device_props.deviceID);
 
   vkGetPhysicalDeviceQueueFamilyProperties(physical_device[0],
                                            &queue_family_prop_count, NULL);
 
-  fprintf(stdout, "Queue Family Property Count: %u\n", queue_family_prop_count);
+  CADE_DEBUG("Queue Family Property Count: %u", queue_family_prop_count);
 
   vkGetPhysicalDeviceQueueFamilyProperties(
       physical_device[0], &queue_family_prop_count, queue_family_props);
@@ -56,10 +55,10 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   u8 queue_family_index;
   for (int i = 0; i < queue_family_prop_count; i++) {
     if (queue_family_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-      fprintf(stdout, "Found graphics queue family at index: %u\n", i);
+      CADE_DEBUG("Found graphics queue family at index: %u", i);
       queue_family_index = i;
 
-      fprintf(stdout, "Queue Family Index %u Properties: %u\n", i,
+      CADE_DEBUG("Queue Family Index %u Properties: %u", i,
               queue_family_props[i].queueCount);
       break;
     }
@@ -83,7 +82,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
       vkCreateDevice(physical_device[0], &device_create_info, NULL, &device);
   result = check_vk_result(vk_result);
 
-  fprintf(stdout, "Device Created\n");
+  CADE_INFO("Device Created");
   context->device = device;
 
   return result;
@@ -97,12 +96,12 @@ b8 is_device_supported(VkPhysicalDevice device,
   VkExtensionProperties ext_props[512]; // TODO: Dynamic allocate when memory
                                         // allocator implemented
   vkEnumerateDeviceExtensionProperties(device, NULL, &prop_count, NULL);
-  fprintf(stdout, "Device Extension Property Count: %u\n", prop_count);
+  CADE_DEBUG("Device Extension Property Count: %u", prop_count);
   vkEnumerateDeviceExtensionProperties(device, NULL, &prop_count, ext_props);
 
   for (int i = 0; i < prop_count; i++) {
     if (strcmp(ext_props[i].extensionName, required_extensions[0]) == 0) {
-      fprintf(stdout, "Physical device supported\n");
+      CADE_INFO("Physical device supported");
       is_supported = TRUE;
       break;
     }

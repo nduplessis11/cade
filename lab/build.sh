@@ -21,8 +21,26 @@ OUTPUT="$BIN_DIR/$ASSEMBLY"
 # Set the compiler
 CC="clang-18"
 
-# Set any compiler flags
-CFLAGS="-g"
+# Build configuration (debug or release)
+BUILD_TYPE="debug"
+
+# Check if a build type was provided as an argument
+if [ $# -ge 1 ]; then
+  BUILD_TYPE=$1
+fi
+
+# Set compiler flags based on build type
+if [ "$BUILD_TYPE" == "debug" ]; then
+  echo "Building in debug mode..."
+  CFLAGS="-g -DDEBUG"
+elif [ "$BUILD_TYPE" == "release" ]; then
+  echo "Building in release mode..."
+  CFLAGS="-O2"
+else
+  echo "Unknown build type: $BUILD_TYPE"
+  echo "Usage: $0 [debug|release]"
+  exit 1
+fi
 
 # Set linker flags
 LDFLAGS="-lxcb -lvulkan"

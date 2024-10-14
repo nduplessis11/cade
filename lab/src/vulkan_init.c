@@ -1,4 +1,5 @@
 #include "vulkan_init.h"
+#include "logger.h"
 #include "vulkan_utils.h"
 
 #include <stdio.h>
@@ -23,8 +24,7 @@ result_t initialize_vulkan(vulkan_context_t *context) {
   for (int i = 0; i < 3; i++) {
     if (!is_extension_available(required_extensions[i], extension_count,
                                 extensions)) {
-      fprintf(stderr, "Required extension %s not available\n",
-              required_extensions[i]);
+      CADE_ERROR("Required extension %s not available", required_extensions[i]);
       xcb_disconnect(context->connection);
       exit(1);
     }
@@ -41,12 +41,12 @@ result_t initialize_vulkan(vulkan_context_t *context) {
   for (int i = 0; i < layer_count; i++) {
     if (strcmp(available_layers[i].layerName, required_layer) == 0) {
       layer_found = TRUE;
-      fprintf(stdout, "Layer found: %s\n", required_layer);
+      CADE_INFO("Layer found: %s", required_layer);
       break;
     }
   }
   if (!layer_found) {
-    fprintf(stderr, "Validation layer not found: %s\n", required_layer);
+    CADE_WARN("Validation layer not found: %s", required_layer);
   }
 
   VkApplicationInfo appInfo = {.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -77,19 +77,19 @@ result_t initialize_vulkan(vulkan_context_t *context) {
       .ppEnabledExtensionNames = required_extensions,
       .ppEnabledLayerNames = &required_layer,
       .enabledLayerCount = 1,
-      .pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debug_create_info};
+      .pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debug_create_info};
 
   vk_result = vkCreateInstance(&createInfo, NULL, &context->instance);
   result = check_vk_result(vk_result);
   if (result.success) {
-    fprintf(stdout, "Vulkan initialized\n");
+    CADE_INFO("Vulkan initialized");
   } else {
-    fprintf(stderr, "Failed initializing Vulkan: %s", result.message);
+    CADE_ERROR("Failed initializing Vulkan: %s", result.message);
   }
 
   result = create_debug_messenger(context, &debug_create_info);
   if (!result.success) {
-    fprintf(stderr, "Failed to created debug messenger: %s\n", result.message);
+    CADE_ERROR("Failed to created debug messenger: %s", result.message);
   }
 
   return result;

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "defines.h"
+#include "logger.h"
 #include "platform_linux.h"
 #include "vulkan_device.h"
 #include "vulkan_init.h"
@@ -15,7 +16,7 @@ int main() {
 
   result = initialize_linux_window(&linux_context, 800, 600);
   if (!result.success) {
-    fprintf(stderr, "Linux error: %s\n", result.message);
+    CADE_ERROR("Linux error: %s\n", result.message);
     exit(1);
   }
 
@@ -23,7 +24,7 @@ int main() {
 
   result = initialize_vulkan(&vulkan_context);
   if (!result.success) {
-    fprintf(stderr, "Vulkan error: %s\n", result.message);
+    CADE_ERROR("Vulkan error: %s", result.message);
     cleanup_vulkan(&vulkan_context);
     cleanup_linux(&linux_context);
     exit(1);
@@ -33,12 +34,12 @@ int main() {
 
   result = create_vulkan_surface(&vulkan_context, linux_context.window);
   if (!result.success) {
-    fprintf(stderr, "Vulkan error: %s\n", result.message);
+    CADE_ERROR("Vulkan error: %s", result.message);
     cleanup_vulkan(&vulkan_context);
     cleanup_linux(&linux_context);
     exit(1);
   }
-  fprintf(stdout, "Vulkan Surface created.\n");
+  CADE_INFO("Vulkan Surface created");
 
   result = create_swapchain(&vulkan_context);
 

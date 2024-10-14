@@ -3,12 +3,14 @@
 #include <stdio.h>
 #include <vulkan/vulkan_core.h>
 
+b8 is_device_supported(VkPhysicalDevice device);
+
 result_t get_vk_physical_device(vulkan_context_t *context) {
   VkResult vk_result = {0};
   result_t result = {.success = TRUE, NULL};
 
   u32 physical_device_count = 0;
-  VkPhysicalDevice physical_device [32];
+  VkPhysicalDevice physical_device[32];
   VkPhysicalDeviceProperties physical_device_props = {0};
   VkQueueFamilyProperties queue_family_props[32];
   u32 queue_family_prop_count = 0;
@@ -42,6 +44,8 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   vkGetPhysicalDeviceQueueFamilyProperties(
       physical_device[0], &queue_family_prop_count, queue_family_props);
 
+  is_device_supported(physical_device[0]);
+
   u8 queue_family_index;
   for (int i = 0; i < queue_family_prop_count; i++) {
     if (queue_family_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
@@ -74,4 +78,26 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   context->device = device;
 
   return result;
+}
+
+b8 is_device_supported(VkPhysicalDevice device) {
+  b8 is_supported = FALSE;
+  const char *required_extensions[32];
+  required_extensions[0] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+
+  u32 prop_count;
+  VkExtensionProperties ext_props[512];
+  vkEnumerateDeviceExtensionProperties(device, NULL, &prop_count, NULL);
+  fprintf(stdout, "Device Extension Property Count: %u\n", prop_count);
+  vkEnumerateDeviceExtensionProperties(device, NULL, &prop_count, ext_props);
+
+  for (int i = 0; i < prop_count; i++) {
+    if (strcmp(ext_props[i].extensionName, required_extensions[0]) == 0) {
+      fprintf(stdout, "Device supported\n");
+      is_supported = TRUE;
+      break;
+    }
+  }
+
+  return is_supported;
 }

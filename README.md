@@ -15,4 +15,5 @@ Tileset and Spritesheet support
 Create simple 2D arcade-style space shooter (Truxton, Gradius, and R-Type etc) and design an engine around that.
 
 ## First Steps
-![first_steps](https://github.com/user-attachments/assets/eee365b5-92d5-414e-a32e-7c359529ca9f)
+![first_steps](https://github.com/user-attachments/assets/d87e39a5-b8cb-478e-80be-0a4e1723dfbc)
+

@@ -35,6 +35,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
     result.message = "Physical device not supported";
     return result;
   }
+
   CADE_INFO("Physical device selected");
   context->physical_device = physical_device[0];
   vkGetPhysicalDeviceProperties(physical_device[0], &physical_device_props);
@@ -46,6 +47,11 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
 
   vkGetPhysicalDeviceQueueFamilyProperties(physical_device[0],
                                            &queue_family_prop_count, NULL);
+
+
+  // Device surface swapchain support
+  VkSurfaceCapabilitiesKHR surface_capabilities;
+  vk_result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(context->physical_device, context->surface, &surface_capabilities);
 
   CADE_DEBUG("Queue Family Property Count: %u", queue_family_prop_count);
 

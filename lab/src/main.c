@@ -1,3 +1,7 @@
+/*
+* TODO: I don't like the way I handle result and close the program on error 
+* */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -30,8 +34,6 @@ int main() {
     exit(1);
   }
 
-  result = get_vk_physical_device(&vulkan_context);
-
   result = create_vulkan_surface(&vulkan_context, linux_context.window);
   if (!result.success) {
     CADE_ERROR("Vulkan error: %s", result.message);
@@ -39,9 +41,23 @@ int main() {
     cleanup_linux(&linux_context);
     exit(1);
   }
+
   CADE_INFO("Vulkan Surface created");
+  result = get_vk_physical_device(&vulkan_context);
+  if (!result.success) {
+    CADE_ERROR("Vulkan error: %s", result.message);
+    cleanup_vulkan(&vulkan_context);
+    cleanup_linux(&linux_context);
+    exit(1);
+  }
 
   result = create_swapchain(&vulkan_context);
+  if (!result.success) {
+    CADE_ERROR("Vulkan error: %s", result.message);
+    cleanup_vulkan(&vulkan_context);
+    cleanup_linux(&linux_context);
+    exit(1);
+  }
 
   // Game loop
   poll_events(&linux_context);

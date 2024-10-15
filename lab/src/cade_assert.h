@@ -7,6 +7,7 @@
  */
 
 #include "defines.h"
+#include "logger.h"
 #include <stdio.h>
 
 #define ASSERTIONS_ENABLED
@@ -39,15 +40,14 @@
 
 static void cade_report_assertion_failure(const char *expression,
                                           const char *file, u32 line) {
-  fprintf(stderr, "[CADE] Assertion failed: (%s), file %s, line %u.\n",
+  CADE_FATAL("Assertion failed: (%s), file %s, line %u.",
           expression, file, line);
 }
 
 static void cade_report_assertion_failure_msg(const char *expression,
                                               const char *message,
-                                              const char *file, int line) {
-  fprintf(stderr,
-          "[CADE] Assertion failed: (%s), message: %s, file %s, line %d.\n",
+                                              const char *file, u32 line) {
+  CADE_FATAL("Assertion failed: (%s), message: %s, file %s, line %u.",
           expression, message, file, line);
 }
 

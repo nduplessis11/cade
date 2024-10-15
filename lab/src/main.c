@@ -1,10 +1,11 @@
 /*
-* TODO: I don't like the way I handle result and close the program on error 
-* */
+ * TODO: I don't like the way I handle result and close the program on error
+ * */
 
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "cade_application.h"
 #include "defines.h"
 #include "logger.h"
 #include "platform_linux.h"
@@ -13,11 +14,15 @@
 #include "vulkan_swapchain.h"
 
 int main() {
+  cade_context_t cade_context = {0};
   linux_context_t linux_context = {0};
   vulkan_context_t vulkan_context = {VK_NULL_HANDLE, VK_NULL_HANDLE, NULL};
   result_t result = {.success = TRUE, .message = NULL};
 
-  result = initialize_linux_window(&linux_context, 800, 600);
+  cade_context.window.width = 800;
+  cade_context.window.height = 600;
+  result = initialize_linux_window(&linux_context, cade_context.window.width,
+                                   cade_context.window.height);
   if (!result.success) {
     CADE_ERROR("Linux error: %s\n", result.message);
     exit(1);

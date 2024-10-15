@@ -11,7 +11,6 @@
 #include "vulkan_device.h"
 #include "vulkan_init.h"
 #include "vulkan_swapchain.h"
-#include "vulkan_utils.h"
 
 int main() {
   linux_context_t linux_context = {0};

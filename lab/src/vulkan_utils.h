@@ -1,25 +1,15 @@
 #pragma once
 
 #include <stdio.h>
-#include <xcb/xcb.h>
 
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
-#include <vulkan/vulkan_xcb.h>
 
 #include <string.h>
 
 #include "defines.h"
 #include "logger.h"
-
-typedef struct {
-  VkInstance instance;
-  VkSurfaceKHR surface;
-  VkPhysicalDevice physical_device;
-  VkDevice device;
-  VkDebugUtilsMessengerEXT debug_messenger;
-  xcb_connection_t *connection;
-} vulkan_context_t;
+#include "vulkan_types.h"
 
 static inline const char *get_vk_result_message(VkResult vk_result) {
   switch (vk_result) {

@@ -96,6 +96,9 @@ result_t initialize_vulkan(vulkan_context_t *context) {
 }
 
 void cleanup_vulkan(vulkan_context_t *context) {
+  if (context->swapchain != VK_NULL_HANDLE) {
+    vkDestroySwapchainKHR(context->device, context->swapchain, NULL);
+  }
   if (context->surface != VK_NULL_HANDLE) {
     vkDestroySurfaceKHR(context->instance, context->surface, NULL);
   }

@@ -61,6 +61,7 @@ result_t create_swapchain(vulkan_context_t *context) {
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
   CADE_INFO("Swapchain created.");
+  context->swapchain = swapchain;
 
   return result;
 }

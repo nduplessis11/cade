@@ -18,6 +18,7 @@ typedef struct {
   VkSurfaceKHR surface;
   VkPhysicalDevice physical_device;
   VkDevice device;
+  VkSwapchainKHR swapchain;
   vulkan_swapchain_support_t swapchain_support;
   VkDebugUtilsMessengerEXT debug_messenger;
   xcb_connection_t *connection;

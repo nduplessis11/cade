@@ -1,4 +1,5 @@
 #include "vulkan_device.h"
+#include "cade_assert.h"
 #include "logger.h"
 #include "vulkan_utils.h"
 #include <stdio.h>
@@ -35,22 +36,59 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
     result.message = "Physical device not supported";
     return result;
   }
+
   CADE_INFO("Physical device selected");
   context->physical_device = physical_device[0];
   vkGetPhysicalDeviceProperties(physical_device[0], &physical_device_props);
-  CADE_INFO("Device Name: %s\n\tAPI Version: %u\n\tDriver Version:%u\n\tVendor ID: "
-            "%u\n\tDevice ID: %u",
-            physical_device_props.deviceName, physical_device_props.apiVersion,
-            physical_device_props.driverVersion, physical_device_props.vendorID,
-            physical_device_props.deviceID);
+  CADE_INFO(
+      "Device Name: %s\n\tAPI Version: %u\n\tDriver Version:%u\n\tVendor ID: "
+      "%u\n\tDevice ID: %u",
+      physical_device_props.deviceName, physical_device_props.apiVersion,
+      physical_device_props.driverVersion, physical_device_props.vendorID,
+      physical_device_props.deviceID);
 
-  vkGetPhysicalDeviceQueueFamilyProperties(physical_device[0],
+  // Device surface swapchain support
+  vk_result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+      context->physical_device, context->surface,
+      &context->swapchain_support.capabilities);
+  result = check_vk_result(vk_result);
+  if (!result.success) {
+    CADE_WARN("Error retrieving swapchain surface support info for physical "
+              "device: %s",
+              result.message);
+  }
+  vk_result = vkGetPhysicalDeviceSurfaceFormatsKHR(
+      context->physical_device, context->surface,
+      &context->swapchain_support.format_count, NULL);
+  result = check_vk_result(vk_result);
+  CADE_ASSERT_DEBUG(result.success);
+  CADE_DEBUG("Physical Device Surface Format count: %u", context->swapchain_support.format_count);
+  vk_result = vkGetPhysicalDeviceSurfaceFormatsKHR(
+      context->physical_device, context->surface,
+      &context->swapchain_support.format_count,
+      context->swapchain_support.formats);
+  result = check_vk_result(vk_result);
+  CADE_ASSERT_DEBUG(result.success);
+  CADE_DEBUG("Physical Device Surface Formats retrieved.");
+  vk_result = vkGetPhysicalDeviceSurfacePresentModesKHR(
+      context->physical_device, context->surface,
+      &context->swapchain_support.present_mode_count, NULL);
+  result = check_vk_result(vk_result);
+  CADE_ASSERT_DEBUG(result.success);
+  CADE_DEBUG("Physical Device Present Mode count: %u", context->swapchain_support.present_mode_count);
+  vk_result = vkGetPhysicalDeviceSurfacePresentModesKHR(
+      context->physical_device, context->surface,
+      &context->swapchain_support.present_mode_count,
+      context->swapchain_support.present_modes);
+  result = check_vk_result(vk_result);
+  CADE_ASSERT_DEBUG(result.success);
+  CADE_DEBUG("Physical Device Present Modes retrieved.");
+
+  vkGetPhysicalDeviceQueueFamilyProperties(context->physical_device,
                                            &queue_family_prop_count, NULL);
-
-  CADE_DEBUG("Queue Family Property Count: %u", queue_family_prop_count);
-
   vkGetPhysicalDeviceQueueFamilyProperties(
       physical_device[0], &queue_family_prop_count, queue_family_props);
+  CADE_DEBUG("Queue Family Property Count: %u", queue_family_prop_count);
 
   u8 queue_family_index;
   for (int i = 0; i < queue_family_prop_count; i++) {
@@ -59,7 +97,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
       queue_family_index = i;
 
       CADE_DEBUG("Queue Family Index %u Properties: %u", i,
-              queue_family_props[i].queueCount);
+                 queue_family_props[i].queueCount);
       break;
     }
   }

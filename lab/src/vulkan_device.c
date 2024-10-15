@@ -57,26 +57,28 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
               "device: %s",
               result.message);
   }
-  u32 format_count;
   vk_result = vkGetPhysicalDeviceSurfaceFormatsKHR(
-      context->physical_device, context->surface, &format_count, NULL);
+      context->physical_device, context->surface,
+      &context->swapchain_support.format_count, NULL);
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
-  CADE_DEBUG("Physical Device Surface Format count: %u", format_count);
+  CADE_DEBUG("Physical Device Surface Format count: %u", context->swapchain_support.format_count);
   vk_result = vkGetPhysicalDeviceSurfaceFormatsKHR(
-      context->physical_device, context->surface, &format_count,
+      context->physical_device, context->surface,
+      &context->swapchain_support.format_count,
       context->swapchain_support.formats);
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
-  CADE_DEBUG("Physical Device Surface Format retrieved.");
-  u32 present_mode_count;
+  CADE_DEBUG("Physical Device Surface Formats retrieved.");
   vk_result = vkGetPhysicalDeviceSurfacePresentModesKHR(
-      context->physical_device, context->surface, &present_mode_count, NULL);
+      context->physical_device, context->surface,
+      &context->swapchain_support.present_mode_count, NULL);
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
-  CADE_DEBUG("Physical Device Present Mode count: %u", present_mode_count);
+  CADE_DEBUG("Physical Device Present Mode count: %u", context->swapchain_support.present_mode_count);
   vk_result = vkGetPhysicalDeviceSurfacePresentModesKHR(
-      context->physical_device, context->surface, &present_mode_count,
+      context->physical_device, context->surface,
+      &context->swapchain_support.present_mode_count,
       context->swapchain_support.present_modes);
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);

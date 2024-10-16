@@ -10,7 +10,7 @@
 #include "defines.h"
 #include "logger.h"
 #include "platform_linux.h"
-#include "vulkan_command_buffer.h"
+#include "vulkan_frame.h"
 #include "vulkan_device.h"
 #include "vulkan_init.h"
 #include "vulkan_swapchain.h"
@@ -65,7 +65,7 @@ int main() {
     exit(1);
   }
 
-  result = init_commands(&vulkan_context);
+  result = frame_init_commands(&vulkan_context);
   CADE_ASSERT_DEBUG(result.success);
 
   // Game loop

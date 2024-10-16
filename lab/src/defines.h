@@ -44,3 +44,5 @@ typedef struct {
   b8 success;
   const char *message;
 } result_t;
+
+#define FRAME_OVERLAP 2

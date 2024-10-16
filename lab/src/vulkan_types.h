@@ -7,7 +7,7 @@
 
 typedef struct vulkan_frame_t {
   VkCommandPool command_pool;
-  VkCommandBuffer command_buffer;
+  VkCommandBuffer main_command_buffer;
 } vulkan_frame_t;
 
 typedef struct vulkan_swapchain_support_t {

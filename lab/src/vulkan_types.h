@@ -8,6 +8,9 @@
 typedef struct vulkan_frame_t {
   VkCommandPool command_pool;
   VkCommandBuffer main_command_buffer;
+  VkSemaphore swapchain_semaphore;
+  VkSemaphore render_semaphore;
+  VkFence render_fence;
 } vulkan_frame_t;
 
 typedef struct vulkan_swapchain_support_t {

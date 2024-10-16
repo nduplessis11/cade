@@ -68,6 +68,9 @@ int main() {
   result = frame_init_commands(&vulkan_context);
   CADE_ASSERT_DEBUG(result.success);
 
+  result = frame_init_sync_structures(&vulkan_context);
+  CADE_ASSERT_DEBUG(result.success);
+
   // Game loop
   poll_events(&linux_context);
 

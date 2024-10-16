@@ -45,3 +45,33 @@ void frame_cleanup_commands(vulkan_context_t *context) {
                          NULL);
   }
 }
+
+result_t frame_init_sync_structures(vulkan_context_t *context) {
+  result_t result = {.success = FALSE, .message = NULL};
+
+  VkFenceCreateInfo fence_create_info = {};
+  fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+  fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+  VkSemaphoreCreateInfo semaphore_create_info = {};
+  semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+  for (int i = 0; i < FRAME_OVERLAP; i++) {
+    VkResult vk_result = vkCreateFence(context->device, &fence_create_info, NULL, &context->frames[i].render_fence);
+    result = check_vk_result(vk_result);
+    CADE_ASSERT_DEBUG(result.success);
+    CADE_DEBUG("Fence created for frame: %u", i);
+
+    vk_result = vkCreateSemaphore(context->device, &semaphore_create_info, NULL, &context->frames[i].swapchain_semaphore);
+    result = check_vk_result(vk_result);
+    CADE_ASSERT_DEBUG(result.success);
+    CADE_DEBUG("Swapchain semaphore created for frame: %u", i);
+
+    vk_result = vkCreateSemaphore(context->device, &semaphore_create_info, NULL, &context->frames[i].render_semaphore);
+    result = check_vk_result(vk_result);
+    CADE_ASSERT_DEBUG(result.success);
+    CADE_DEBUG("Render semaphore created for frame: %u", i);
+  }
+
+  return result;
+}

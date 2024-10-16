@@ -90,11 +90,10 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
       physical_device[0], &queue_family_prop_count, queue_family_props);
   CADE_DEBUG("Queue Family Property Count: %u", queue_family_prop_count);
 
-  u8 queue_family_index;
   for (int i = 0; i < queue_family_prop_count; i++) {
     if (queue_family_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
       CADE_DEBUG("Found graphics queue family at index: %u", i);
-      queue_family_index = i;
+      context->queue_family_index = i;
 
       CADE_DEBUG("Queue Family Index %u Properties: %u", i,
                  queue_family_props[i].queueCount);
@@ -105,7 +104,7 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   float queue_priority = 1.0f;
   VkDeviceQueueCreateInfo queue_create_info = {};
   queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-  queue_create_info.queueFamilyIndex = queue_family_index;
+  queue_create_info.queueFamilyIndex = context->queue_family_index;
   queue_create_info.queueCount = 1;
   queue_create_info.pQueuePriorities = &queue_priority;
 

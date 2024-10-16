@@ -1,5 +1,6 @@
 #include "vulkan_init.h"
 #include "logger.h"
+#include "vulkan_frame.h"
 #include "vulkan_utils.h"
 
 #include <stdio.h>
@@ -96,6 +97,7 @@ result_t initialize_vulkan(vulkan_context_t *context) {
 }
 
 void cleanup_vulkan(vulkan_context_t *context) {
+  frame_cleanup_commands(context);
   if (context->swapchain != VK_NULL_HANDLE) {
     vkDestroySwapchainKHR(context->device, context->swapchain, NULL);
   }

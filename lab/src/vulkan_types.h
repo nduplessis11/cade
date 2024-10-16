@@ -6,6 +6,11 @@
 #include <vulkan/vulkan_xcb.h>
 
 typedef struct {
+  VkCommandPool command_pool;
+  VkCommandBuffer command_buffer;
+} vulkan_frame_t;
+
+typedef struct {
   VkSurfaceCapabilitiesKHR capabilities;
   VkSurfaceFormatKHR formats[32];
   u32 format_count;
@@ -18,6 +23,7 @@ typedef struct {
   VkSurfaceKHR surface;
   VkPhysicalDevice physical_device;
   VkDevice device;
+  u32 queue_family_index;
   VkSwapchainKHR swapchain;
   vulkan_swapchain_support_t swapchain_support;
   VkDebugUtilsMessengerEXT debug_messenger;

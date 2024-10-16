@@ -5,10 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "cade_assert.h"
 #include "cade_application.h"
 #include "defines.h"
 #include "logger.h"
 #include "platform_linux.h"
+#include "vulkan_command_buffer.h"
 #include "vulkan_device.h"
 #include "vulkan_init.h"
 #include "vulkan_swapchain.h"
@@ -62,6 +64,9 @@ int main() {
     cleanup_linux(&linux_context);
     exit(1);
   }
+
+  result = init_commands(&vulkan_context);
+  CADE_ASSERT_DEBUG(result.success);
 
   // Game loop
   poll_events(&linux_context);

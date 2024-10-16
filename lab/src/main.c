@@ -13,6 +13,7 @@
 #include "vulkan_frame.h"
 #include "vulkan_device.h"
 #include "vulkan_init.h"
+#include "vulkan_renderer.h"
 #include "vulkan_swapchain.h"
 
 int main() {
@@ -70,6 +71,8 @@ int main() {
 
   result = frame_init_sync_structures(&vulkan_context);
   CADE_ASSERT_DEBUG(result.success);
+
+  renderer_draw(&vulkan_context);
 
   // Game loop
   poll_events(&linux_context);

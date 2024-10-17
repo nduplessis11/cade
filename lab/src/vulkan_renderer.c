@@ -35,6 +35,16 @@ void renderer_draw(vulkan_context_t *context) {
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
   CADE_DEBUG("Command Buffer reset.");
+  vk_result = vkBeginCommandBuffer(cmd, &begin_info);
+  result = check_vk_result(vk_result);
+  CADE_ASSERT_DEBUG(result.success);
+  CADE_DEBUG("Command buffer recording...");
 
-  // image_transition(cmd, swapchain_image_index, VkImageLayout current_layout, VkImageLayout new_layout)
+  CADE_DEBUG("context->swapchain_images[%u] = %u", swapchain_image_index, context->swapchain_images[swapchain_image_index]);
+  // image_transition(cmd, context->swapchain_images[swapchain_image_index], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+  
+  vk_result = vkEndCommandBuffer(cmd);
+  result = check_vk_result(vk_result);
+  CADE_ASSERT_DEBUG(result.success);
+  CADE_DEBUG("Command buffer stopped recording.");
 }

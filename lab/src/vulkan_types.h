@@ -28,6 +28,8 @@ typedef struct vulkan_context_t {
   VkDevice device;
   u32 queue_family_index;
   VkSwapchainKHR swapchain;
+  VkImage swapchain_images[32];
+  u32 swapchain_image_count;
   vulkan_swapchain_support_t swapchain_support;
   vulkan_frame_t frames[FRAME_OVERLAP];
   u32 frame_number;

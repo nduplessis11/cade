@@ -109,8 +109,21 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   queue_create_info.queueCount = 1;
   queue_create_info.pQueuePriorities = &queue_priority;
 
+  VkPhysicalDeviceFeatures features = {};
+  VkPhysicalDeviceVulkan13Features features13 = {};
+  features13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+  // set the desired features here:
+  features13.dynamicRendering = VK_TRUE;
+  features13.synchronization2 = VK_TRUE;
+
+  VkPhysicalDeviceFeatures2 features2 = {};
+  features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+  features2.pNext = &features13;
+  features2.features = features;
+
   VkDeviceCreateInfo device_create_info = {};
   device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  device_create_info.pNext = &features2;
   device_create_info.queueCreateInfoCount = 1;
   device_create_info.pQueueCreateInfos = &queue_create_info;
   device_create_info.enabledExtensionCount = 1;

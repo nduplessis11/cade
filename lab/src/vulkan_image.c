@@ -5,8 +5,9 @@ VkImageSubresourceRange image_subresource_range(VkImageAspectFlags aspect_mask);
 
 void image_transition(VkCommandBuffer cmd, VkImage image,
                       VkImageLayout current_layout, VkImageLayout new_layout) {
-  VkImageMemoryBarrier2 image_barrier;
-  image_barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER_2;
+  VkImageMemoryBarrier2 image_barrier = {0};
+  image_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+  image_barrier.pNext = NULL;
   image_barrier.srcStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
   image_barrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
   image_barrier.dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
@@ -22,8 +23,9 @@ void image_transition(VkCommandBuffer cmd, VkImage image,
   image_barrier.subresourceRange = image_subresource_range(aspect_mask);
   image_barrier.image = image;
 
-  VkDependencyInfo dep_info = {};
+  VkDependencyInfo dep_info = {0};
   dep_info.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+  dep_info.pNext = NULL;
   dep_info.imageMemoryBarrierCount = 1;
   dep_info.pImageMemoryBarriers = &image_barrier;
 
@@ -32,7 +34,7 @@ void image_transition(VkCommandBuffer cmd, VkImage image,
 
 VkImageSubresourceRange
 image_subresource_range(VkImageAspectFlags aspect_mask) {
-  VkImageSubresourceRange sub_image = {};
+  VkImageSubresourceRange sub_image = {0};
   sub_image.aspectMask = aspect_mask;
   sub_image.baseMipLevel = 0;
   sub_image.levelCount = VK_REMAINING_MIP_LEVELS;

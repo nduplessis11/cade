@@ -40,12 +40,11 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   CADE_INFO("Physical device selected");
   context->physical_device = physical_device[0];
   vkGetPhysicalDeviceProperties(physical_device[0], &physical_device_props);
-  CADE_INFO(
-      "Device Name: %s\n\tAPI Version: %u\n\tDriver Version:%u\n\tVendor ID: "
-      "%u\n\tDevice ID: %u",
-      physical_device_props.deviceName, physical_device_props.apiVersion,
-      physical_device_props.driverVersion, physical_device_props.vendorID,
-      physical_device_props.deviceID);
+  CADE_INFO("Device Name: %s", physical_device_props.deviceName);
+  CADE_INFO("Vulkan API Version: %u.%u.%u",
+            VK_VERSION_MAJOR(physical_device_props.apiVersion),
+            VK_VERSION_MINOR(physical_device_props.apiVersion),
+            VK_VERSION_PATCH(physical_device_props.apiVersion));
 
   // Device surface swapchain support
   vk_result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
@@ -62,7 +61,8 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
       &context->swapchain_support.format_count, NULL);
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
-  CADE_DEBUG("Physical Device Surface Format count: %u", context->swapchain_support.format_count);
+  CADE_DEBUG("Physical Device Surface Format count: %u",
+             context->swapchain_support.format_count);
   vk_result = vkGetPhysicalDeviceSurfaceFormatsKHR(
       context->physical_device, context->surface,
       &context->swapchain_support.format_count,
@@ -75,7 +75,8 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
       &context->swapchain_support.present_mode_count, NULL);
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
-  CADE_DEBUG("Physical Device Present Mode count: %u", context->swapchain_support.present_mode_count);
+  CADE_DEBUG("Physical Device Present Mode count: %u",
+             context->swapchain_support.present_mode_count);
   vk_result = vkGetPhysicalDeviceSurfacePresentModesKHR(
       context->physical_device, context->surface,
       &context->swapchain_support.present_mode_count,

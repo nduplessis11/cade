@@ -5,6 +5,7 @@
 #include "vulkan_image.h"
 #include "vulkan_types.h"
 #include "vulkan_utils.h"
+#include <math.h>
 #include <vulkan/vulkan_core.h>
 
 void renderer_draw(vulkan_context_t *context) {
@@ -33,15 +34,6 @@ void renderer_draw(vulkan_context_t *context) {
   CADE_DEBUG("Frame %u: Next image at index %u aquired from swapchain.",
              current_frame, swapchain_image_index);
 
-  // TEST
-  PFN_vkCmdPipelineBarrier2 vkCmdPipelineBarrier2Func =
-      (PFN_vkCmdPipelineBarrier2)vkGetDeviceProcAddr(context->device,
-                                                     "vkCmdPipelineBarrier2");
-
-  if (vkCmdPipelineBarrier2Func == NULL) {
-    CADE_WARN("vkCmdPipelineBarrier2 is NULL. Function not available.");
-  }
-
   // Record command command buffer
   VkCommandBufferBeginInfo begin_info = {0};
   begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -60,6 +52,22 @@ void renderer_draw(vulkan_context_t *context) {
              context->swapchain_images[swapchain_image_index]);
   image_transition(cmd, context->swapchain_images[swapchain_image_index],
                    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+
+  // Clear image. Flash with a 120 frame period.
+  VkClearColorValue clear_value;
+  f32 flash = fabsf(sinf(context->frame_number / 120.0f));
+  clear_value.float32[0] = 0.0f;
+  clear_value.float32[1] = 0.0f;
+  clear_value.float32[2] = flash;
+  clear_value.float32[3] = 1.0f;
+  VkImageSubresourceRange clear_range =
+      image_subresource_range(VK_IMAGE_ASPECT_COLOR_BIT);
+  vkCmdClearColorImage(cmd, context->swapchain_images[swapchain_image_index],
+                       VK_IMAGE_LAYOUT_GENERAL, &clear_value, 1, &clear_range);
+
+  // Transition swapchain image into presentable mode
+  image_transition(cmd, context->swapchain_images[swapchain_image_index],
+                   VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
   vk_result = vkEndCommandBuffer(cmd);
   result = check_vk_result(vk_result);

@@ -63,5 +63,18 @@ result_t create_swapchain(vulkan_context_t *context) {
   CADE_INFO("Swapchain created.");
   context->swapchain = swapchain;
 
+  // Retrieve swapchain images
+  u32 image_count;
+  VkImage images[32];
+  vk_result = vkGetSwapchainImagesKHR(context->device, swapchain, &image_count, NULL);
+  result = check_vk_result(vk_result);
+  CADE_ASSERT_DEBUG(image_count);
+  CADE_DEBUG("Swapchain image count: %u", image_count);
+
+  vk_result = vkGetSwapchainImagesKHR(context->device, swapchain, &image_count, images);
+  result = check_vk_result(vk_result);
+  CADE_ASSERT_DEBUG(images[0]);
+  CADE_DEBUG("Swapchain images retrieved successfully");
+
   return result;
 }

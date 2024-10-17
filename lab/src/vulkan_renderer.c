@@ -2,6 +2,7 @@
 #include "cade_assert.h"
 #include "defines.h"
 #include "logger.h"
+#include "vulkan_image.h"
 #include "vulkan_types.h"
 #include "vulkan_utils.h"
 #include <vulkan/vulkan_core.h>
@@ -34,4 +35,6 @@ void renderer_draw(vulkan_context_t *context) {
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
   CADE_DEBUG("Command Buffer reset.");
+
+  // image_transition(cmd, swapchain_image_index, VkImageLayout current_layout, VkImageLayout new_layout)
 }

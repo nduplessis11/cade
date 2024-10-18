@@ -72,10 +72,10 @@ int main() {
   result = frame_init_sync_structures(&vulkan_context);
   CADE_ASSERT_DEBUG(result.success);
 
-  renderer_draw(&vulkan_context);
+  // renderer_draw(&vulkan_context);
 
   // Game loop
-  poll_events(&linux_context);
+  poll_events(&linux_context, &vulkan_context);
 
   // Cleanup
   cleanup_vulkan(&vulkan_context);

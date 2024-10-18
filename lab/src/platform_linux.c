@@ -1,9 +1,12 @@
 #include "platform_linux.h"
+#include "vulkan_renderer.h"
+#include "vulkan_types.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <vulkan/vulkan.h>
 #include <xcb/xcb.h>
+#include <xcb/xproto.h>
 
 result_t initialize_linux_window(linux_context_t *context, u32 width,
                                  u32 height) {
@@ -50,24 +53,29 @@ void cleanup_linux(linux_context_t *context) {
   }
 }
 
-b8 poll_events(linux_context_t *context) {
+b8 poll_events(linux_context_t *context, vulkan_context_t *vulkan_context) {
   b8 is_running = TRUE;
   xcb_generic_event_t *event;
-  while ((event = xcb_wait_for_event(context->connection))) {
-    switch (event->response_type & ~0x80) {
-    case XCB_EXPOSE:
-      printf("Window exposed\n");
-      break;
-    case XCB_KEY_PRESS:
-      is_running = FALSE;
-      break;
-    }
-    free(event);
-    if (is_running == FALSE) {
-      return FALSE;
+
+  while (is_running) {
+    event = xcb_poll_for_event(context->connection);
+    if (event) {
+      switch (event->response_type & ~0x80) {
+      case XCB_EXPOSE:
+        printf("Window exposed\n");
+        break;
+      case XCB_KEY_PRESS:
+        is_running = FALSE;
+        break;
+      }
+      free(event);
+    } else {
+      renderer_draw(vulkan_context);
+      // Small delay to prevent CPU overuse
+      struct timespec req = {0, 100000000L}; // 100 milliseconds
+      nanosleep(&req, NULL);
     }
   }
-
   return FALSE;
 }
 

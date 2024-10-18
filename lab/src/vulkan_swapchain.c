@@ -1,11 +1,14 @@
 #include "vulkan_swapchain.h"
 #include "logger.h"
 #include "cade_assert.h"
+#include "platform_linux.h"
 #include "vulkan_utils.h"
 #include <stdio.h>
 #include <vulkan/vulkan_core.h>
 
-result_t create_swapchain(vulkan_context_t *context) {
+VkExtent2D find_extent(const VkSurfaceCapabilitiesKHR *capabilities, uint32_t desired_width, uint32_t desired_height);
+
+result_t create_swapchain(vulkan_context_t *context, linux_context_t *linux_context) {
   result_t result = {.success = TRUE, .message = NULL};
 
   CADE_INFO("Creating swapchain...");
@@ -38,11 +41,9 @@ result_t create_swapchain(vulkan_context_t *context) {
   CADE_DEBUG("Present mode selected.");
 
   // Vulkan Exent Selection
-  VkExtent2D extent;
-  extent.width = 800;
-  extent.height = 600;
+  VkExtent2D extent = find_extent(&context->swapchain_support.capabilities, 800, 600);
+  CADE_DEBUG("EXTENT: %u x %u", extent.width, extent.height);
 
-  VkSwapchainKHR swapchain = {0};
   VkSwapchainCreateInfoKHR create_info = {0};
   create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
   create_info.surface = context->surface;
@@ -57,22 +58,36 @@ result_t create_swapchain(vulkan_context_t *context) {
   create_info.oldSwapchain = VK_NULL_HANDLE;
   create_info.preTransform = context->swapchain_support.capabilities.currentTransform;
   create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-  VkResult vk_result = vkCreateSwapchainKHR(context->device, &create_info, NULL, &swapchain);
+  VkResult vk_result = vkCreateSwapchainKHR(context->device, &create_info, NULL, &context->swapchain);
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
   CADE_INFO("Swapchain created.");
-  context->swapchain = swapchain;
 
   // Retrieve swapchain images
-  vk_result = vkGetSwapchainImagesKHR(context->device, swapchain, &context->swapchain_image_count, NULL);
+  vk_result = vkGetSwapchainImagesKHR(context->device, context->swapchain, &context->swapchain_image_count, NULL);
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
   CADE_DEBUG("Swapchain image count: %u", context->swapchain_image_count);
 
-  vk_result = vkGetSwapchainImagesKHR(context->device, swapchain, &context->swapchain_image_count, context->swapchain_images);
+  vk_result = vkGetSwapchainImagesKHR(context->device, context->swapchain, &context->swapchain_image_count, context->swapchain_images);
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
   CADE_DEBUG("Swapchain images retrieved successfully");
 
   return result;
+}
+
+VkExtent2D find_extent(const VkSurfaceCapabilitiesKHR *capabilities, uint32_t desired_width, uint32_t desired_height) {
+    if (capabilities->currentExtent.width != UINT32_MAX) {
+        return capabilities->currentExtent;
+    } else {
+        VkExtent2D actual_extent = { desired_width, desired_height };
+
+        actual_extent.width = MAX(capabilities->minImageExtent.width,
+                                 MIN(capabilities->maxImageExtent.width, actual_extent.width));
+        actual_extent.height = MAX(capabilities->minImageExtent.height,
+                                  MIN(capabilities->maxImageExtent.height, actual_extent.height));
+
+        return actual_extent;
+    }
 }

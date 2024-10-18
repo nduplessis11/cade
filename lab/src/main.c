@@ -13,7 +13,6 @@
 #include "vulkan_frame.h"
 #include "vulkan_device.h"
 #include "vulkan_init.h"
-#include "vulkan_renderer.h"
 #include "vulkan_swapchain.h"
 
 int main() {
@@ -58,7 +57,7 @@ int main() {
     exit(1);
   }
 
-  result = create_swapchain(&vulkan_context);
+  result = create_swapchain(&vulkan_context, &linux_context);
   if (!result.success) {
     CADE_ERROR("Vulkan error: %s", result.message);
     cleanup_vulkan(&vulkan_context);

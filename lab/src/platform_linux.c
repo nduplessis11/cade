@@ -93,3 +93,26 @@ result_t create_vulkan_surface(vulkan_context_t *context, xcb_window_t window) {
   result = check_vk_result(vk_result);
   return result;
 }
+
+void get_framebuffer_size(linux_context_t *linux_context, u16 *width, u16 *height) {
+  // Send the geometry request
+  xcb_get_geometry_cookie_t geom_cookie = xcb_get_geometry(linux_context->connection, linux_context->window);
+
+  // Retrieve the reply
+  xcb_generic_error_t *error;
+  xcb_get_geometry_reply_t *geom =
+      xcb_get_geometry_reply(linux_context->connection, geom_cookie, &error);
+
+  if (geom) {
+    *width = geom->width;
+    *height = geom->height;
+    printf("Width: %d, Height: %d\n", *width, *height);
+    free(geom);
+  } else {
+    fprintf(stderr, "Error: Cannot get geometry\n");
+    if (error) {
+      fprintf(stderr, "Error code: %d\n", error->error_code);
+      free(error);
+    }
+  }
+}

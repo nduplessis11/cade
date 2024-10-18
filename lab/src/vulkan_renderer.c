@@ -12,6 +12,7 @@
 void renderer_draw(vulkan_context_t *context) {
   // Wait until GPU finished rendering last frame. 1 second timeout.
   u32 current_frame = context->frame_number % FRAME_OVERLAP;
+  CADE_DEBUG("Waiting for fences at frame: %u", current_frame);
   VkResult vk_result = vkWaitForFences(
       context->device, 1, &context->frames[current_frame].render_fence, VK_TRUE,
       1000000000);
@@ -89,8 +90,10 @@ void renderer_draw(vulkan_context_t *context) {
   present_info.waitSemaphoreCount = 1;
   present_info.pImageIndices = &swapchain_image_index;
 
+  CADE_DEBUG("Presenting queue...");
   vk_result = vkQueuePresentKHR(context->queue, &present_info);
   result = check_vk_result(vk_result);
+  CADE_DEBUG("vkQueuePresentKHR returned: %d", vk_result);
   CADE_ASSERT_DEBUG(result.success);
   CADE_DEBUG("Presented queue.");
 

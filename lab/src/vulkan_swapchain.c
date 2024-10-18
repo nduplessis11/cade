@@ -14,7 +14,7 @@ result_t create_swapchain(vulkan_context_t *context) {
   b8 found_format = FALSE;
   for (int i = 0; i < context->swapchain_support.format_count; i++) {
     if (context->swapchain_support.formats[i].format ==
-            VK_FORMAT_B8G8R8A8_SRGB &&
+            VK_FORMAT_B8G8R8A8_UNORM &&
         context->swapchain_support.formats[i].colorSpace ==
             VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
       format = context->swapchain_support.formats[i];

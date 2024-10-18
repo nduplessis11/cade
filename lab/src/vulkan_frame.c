@@ -84,7 +84,7 @@ result_t frame_init_sync_structures(vulkan_context_t *context) {
 
 result_t frame_submit_queue(vulkan_context_t *context) {
   vulkan_frame_t current_frame =
-      context->frames[context->frame_number & FRAME_OVERLAP];
+      context->frames[context->frame_number % FRAME_OVERLAP];
   VkCommandBuffer cmd = current_frame.main_command_buffer;
 
   VkSemaphoreSubmitInfo wait_info = {0};

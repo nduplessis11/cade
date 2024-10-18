@@ -94,6 +94,8 @@ void renderer_draw(vulkan_context_t *context) {
   vk_result = vkQueuePresentKHR(context->queue, &present_info);
   result = check_vk_result(vk_result);
   CADE_DEBUG("vkQueuePresentKHR returned: %d", vk_result);
+  // TODO: This breaks because x-window resize event is triggered 3x on startup.
+  // Need to recreate the swapchain or create it after polling events
   CADE_ASSERT_DEBUG(result.success);
   CADE_DEBUG("Presented queue.");
 

@@ -1,4 +1,5 @@
 #include "platform_linux.h"
+#include "logger.h"
 #include "vulkan_renderer.h"
 #include "vulkan_types.h"
 
@@ -29,8 +30,9 @@ result_t initialize_linux_window(linux_context_t *context, u32 width,
   // Create a window
   xcb_window_t window = xcb_generate_id(connection);
   u32 mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-  u32 values[2] = {screen->black_pixel,
-                   XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS};
+  u32 values[2] = {screen->black_pixel, XCB_EVENT_MASK_EXPOSURE |
+                                            XCB_EVENT_MASK_KEY_PRESS |
+                                            XCB_EVENT_MASK_STRUCTURE_NOTIFY};
 
   xcb_create_window(connection, XCB_COPY_FROM_PARENT, window, screen->root, 10,
                     10, 800, 600, 1, XCB_WINDOW_CLASS_INPUT_OUTPUT,
@@ -62,11 +64,20 @@ b8 poll_events(linux_context_t *context, vulkan_context_t *vulkan_context) {
     if (event) {
       switch (event->response_type & ~0x80) {
       case XCB_EXPOSE:
-        printf("Window exposed\n");
+        CADE_DEBUG("Window exposed.");
         break;
       case XCB_KEY_PRESS:
         is_running = FALSE;
         break;
+      case XCB_CONFIGURE_NOTIFY: {
+        // Handle window resize/move
+        xcb_configure_notify_event_t *configure_event =
+            (xcb_configure_notify_event_t *)event;
+        u32 new_width = configure_event->width;
+        u32 new_height = configure_event->height;
+        CADE_DEBUG("Window resized to %ux%u", new_width, new_height);
+        break;
+      }
       }
       free(event);
     } else {
@@ -94,9 +105,11 @@ result_t create_vulkan_surface(vulkan_context_t *context, xcb_window_t window) {
   return result;
 }
 
-void get_framebuffer_size(linux_context_t *linux_context, u16 *width, u16 *height) {
+void get_framebuffer_size(linux_context_t *linux_context, u16 *width,
+                          u16 *height) {
   // Send the geometry request
-  xcb_get_geometry_cookie_t geom_cookie = xcb_get_geometry(linux_context->connection, linux_context->window);
+  xcb_get_geometry_cookie_t geom_cookie =
+      xcb_get_geometry(linux_context->connection, linux_context->window);
 
   // Retrieve the reply
   xcb_generic_error_t *error;

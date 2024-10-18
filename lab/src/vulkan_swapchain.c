@@ -38,7 +38,7 @@ result_t create_swapchain(vulkan_context_t *context, linux_context_t *linux_cont
     }
   }
   CADE_ASSERT_DEBUG(found_present_mode);
-  CADE_DEBUG("Present mode selected.");
+  CADE_DEBUG("Present mode selected: %u", present_mode);
 
   // Vulkan Exent Selection
   VkExtent2D extent = find_extent(&context->swapchain_support.capabilities, 800, 600);

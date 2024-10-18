@@ -60,6 +60,7 @@ static inline const char *get_vk_result_message(VkResult vk_result) {
 static inline result_t check_vk_result(VkResult vk_result) {
   if (vk_result != VK_SUCCESS) {
     const char *vk_message = get_vk_result_message(vk_result);
+    CADE_ERROR("VULKAN ERROR: %s", vk_message);
     result_t result = {.success = FALSE, .message = vk_message};
     return result;
   }

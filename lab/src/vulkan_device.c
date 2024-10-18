@@ -136,6 +136,8 @@ result_t get_vk_physical_device(vulkan_context_t *context) {
   CADE_INFO("Device Created");
   context->device = device;
 
+  vkGetDeviceQueue(context->device, context->queue_family_index, 0, &context->queue);
+
   return result;
 }
 

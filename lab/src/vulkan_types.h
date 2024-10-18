@@ -26,6 +26,7 @@ typedef struct vulkan_context_t {
   VkSurfaceKHR surface;
   VkPhysicalDevice physical_device;
   VkDevice device;
+  VkQueue queue;
   u32 queue_family_index;
   VkSwapchainKHR swapchain;
   VkImage swapchain_images[32];

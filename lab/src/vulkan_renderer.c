@@ -2,6 +2,7 @@
 #include "cade_assert.h"
 #include "defines.h"
 #include "logger.h"
+#include "vulkan_frame.h"
 #include "vulkan_image.h"
 #include "vulkan_types.h"
 #include "vulkan_utils.h"
@@ -73,4 +74,25 @@ void renderer_draw(vulkan_context_t *context) {
   result = check_vk_result(vk_result);
   CADE_ASSERT_DEBUG(result.success);
   CADE_DEBUG("Command buffer stopped recording.");
+
+  // Submit command buffer to queue
+  result = frame_submit_queue(context);
+  CADE_ASSERT_DEBUG(result.success);
+
+  // Present the queue
+  VkPresentInfoKHR present_info = {0};
+  present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+  present_info.pSwapchains = &context->swapchain;
+  present_info.swapchainCount = 1;
+  present_info.pWaitSemaphores =
+      &context->frames[current_frame].render_semaphore;
+  present_info.waitSemaphoreCount = 1;
+  present_info.pImageIndices = &swapchain_image_index;
+
+  vk_result = vkQueuePresentKHR(context->queue, &present_info);
+  result = check_vk_result(vk_result);
+  CADE_ASSERT_DEBUG(result.success);
+  CADE_DEBUG("Presented queue.");
+
+  context->frame_number++;
 }

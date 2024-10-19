@@ -2,6 +2,7 @@
 #include "logger.h"
 #include "cade_assert.h"
 #include "platform_linux.h"
+#include "vulkan_types.h"
 #include "vulkan_utils.h"
 #include <stdio.h>
 #include <vulkan/vulkan_core.h>
@@ -90,4 +91,11 @@ VkExtent2D find_extent(const VkSurfaceCapabilitiesKHR *capabilities, uint32_t de
 
         return actual_extent;
     }
+}
+
+void resize_swapchain(vulkan_context_t *context, linux_context_t *linux_context) {
+  vkDeviceWaitIdle(context->device);
+  vkDestroySwapchainKHR(context->device, context->swapchain, NULL);
+  create_swapchain(context, linux_context);
+  context->resize_requested = FALSE;
 }

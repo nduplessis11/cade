@@ -6,4 +6,4 @@
 #include <vulkan/vulkan_core.h>
 
 result_t create_swapchain(vulkan_context_t *context, linux_context_t *linux_context);
-
+void resize_swapchain(vulkan_context_t *context, linux_context_t *linux_context);

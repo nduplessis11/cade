@@ -1,6 +1,7 @@
 #include "platform_linux.h"
 #include "logger.h"
 #include "vulkan_renderer.h"
+#include "vulkan_swapchain.h"
 #include "vulkan_types.h"
 
 #include <stdio.h>
@@ -85,6 +86,9 @@ b8 poll_events(linux_context_t *context, vulkan_context_t *vulkan_context) {
       // Small delay to prevent CPU overuse
       struct timespec req = {0, 100000000L}; // 100 milliseconds
       nanosleep(&req, NULL);
+      if (vulkan_context->resize_requested) {
+        resize_swapchain(vulkan_context, context);
+      }
     }
   }
   return FALSE;

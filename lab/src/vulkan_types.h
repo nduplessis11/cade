@@ -36,5 +36,6 @@ typedef struct vulkan_context_t {
   u32 frame_number;
   VkDebugUtilsMessengerEXT debug_messenger;
   xcb_connection_t *connection;
+  b8 resize_requested;
 } vulkan_context_t;
 

@@ -18,7 +18,7 @@
 int main() {
   cade_context_t cade_context = {0};
   linux_context_t linux_context = {0};
-  vulkan_context_t vulkan_context = {VK_NULL_HANDLE, VK_NULL_HANDLE, NULL};
+  vulkan_context_t vulkan_context = {0};
   result_t result = {.success = TRUE, .message = NULL};
 
   cade_context.window.width = 800;

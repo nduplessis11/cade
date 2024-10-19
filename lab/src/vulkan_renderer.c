@@ -31,8 +31,10 @@ void renderer_draw(vulkan_context_t *context) {
       vkAcquireNextImageKHR(context->device, context->swapchain, 1000000000,
                             context->frames[current_frame].swapchain_semaphore,
                             NULL, &swapchain_image_index);
-  result = check_vk_result(vk_result);
-  CADE_ASSERT_DEBUG(result.success);
+  if (vk_result == VK_ERROR_OUT_OF_DATE_KHR) {
+    context->resize_requested = TRUE;
+    return;
+  }
   CADE_DEBUG("Frame %u: Next image at index %u aquired from swapchain.",
              current_frame, swapchain_image_index);
 
@@ -92,11 +94,11 @@ void renderer_draw(vulkan_context_t *context) {
 
   CADE_DEBUG("Presenting queue...");
   vk_result = vkQueuePresentKHR(context->queue, &present_info);
-  result = check_vk_result(vk_result);
+  if (vk_result == VK_ERROR_OUT_OF_DATE_KHR) {
+    context->resize_requested = TRUE;
+    return;
+  }
   CADE_DEBUG("vkQueuePresentKHR returned: %d", vk_result);
-  // TODO: This breaks because x-window resize event is triggered 3x on startup.
-  // Need to recreate the swapchain or create it after polling events
-  CADE_ASSERT_DEBUG(result.success);
   CADE_DEBUG("Presented queue.");
 
   context->frame_number++;

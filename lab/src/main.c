@@ -18,7 +18,7 @@
 int main() {
   cade_context_t cade_context = {0};
   linux_context_t linux_context = {0};
-  vulkan_context_t vulkan_context = {VK_NULL_HANDLE, VK_NULL_HANDLE, NULL};
+  vulkan_context_t vulkan_context = {0};
   result_t result = {.success = TRUE, .message = NULL};
 
   cade_context.window.width = 800;
@@ -57,7 +57,7 @@ int main() {
     exit(1);
   }
 
-  result = create_swapchain(&vulkan_context);
+  result = create_swapchain(&vulkan_context, &linux_context);
   if (!result.success) {
     CADE_ERROR("Vulkan error: %s", result.message);
     cleanup_vulkan(&vulkan_context);
@@ -68,8 +68,13 @@ int main() {
   result = frame_init_commands(&vulkan_context);
   CADE_ASSERT_DEBUG(result.success);
 
+  result = frame_init_sync_structures(&vulkan_context);
+  CADE_ASSERT_DEBUG(result.success);
+
+  // renderer_draw(&vulkan_context);
+
   // Game loop
-  poll_events(&linux_context);
+  poll_events(&linux_context, &vulkan_context);
 
   // Cleanup
   cleanup_vulkan(&vulkan_context);

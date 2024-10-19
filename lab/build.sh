@@ -43,7 +43,7 @@ else
 fi
 
 # Set linker flags
-LDFLAGS="-lxcb -lvulkan"
+LDFLAGS="-lxcb -lvulkan -lm"
 
 # Build the project
 $CC $CFLAGS $SRC_FILES $LDFLAGS -o $OUTPUT

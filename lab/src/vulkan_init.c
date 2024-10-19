@@ -55,7 +55,7 @@ result_t initialize_vulkan(vulkan_context_t *context) {
                                .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
                                .pEngineName = "No engine",
                                .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-                               .apiVersion = VK_API_VERSION_1_0};
+                               .apiVersion = VK_API_VERSION_1_3};
 
   // Setup vulkan debugging
   VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {};
@@ -97,6 +97,8 @@ result_t initialize_vulkan(vulkan_context_t *context) {
 }
 
 void cleanup_vulkan(vulkan_context_t *context) {
+  vkDeviceWaitIdle(context->device);
+
   frame_cleanup_commands(context);
   if (context->swapchain != VK_NULL_HANDLE) {
     vkDestroySwapchainKHR(context->device, context->swapchain, NULL);
